@@ -1,8 +1,9 @@
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 
-import { Ingredient } from '../../components/Ingredient';
 import { styles } from './styles';
 import { useState } from 'react';
+import { Ingredient } from '@/components/Ingredient';
+import { Selected } from '@/components/Selected';
 
 export default function Index() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -13,8 +14,13 @@ export default function Index() {
     } else {
       setSelected([...selected, value]);
     }
+  };
 
-    console.log(selected);
+  const handleClearSelected = () => {
+    Alert.alert('Limpar', 'Deseja limpar os ingredientes selecionados?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Limpar', onPress: () => setSelected([]) },
+    ]);
   };
 
   return (
@@ -46,6 +52,10 @@ export default function Index() {
           />
         ))}
       </ScrollView>
+
+      {selected.length > 0 && (
+        <Selected quantity={selected.length} onClear={handleClearSelected} onSearch={() => {}} />
+      )}
     </View>
   );
 }
