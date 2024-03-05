@@ -1,13 +1,15 @@
 import { Alert, ScrollView, Text, View } from 'react-native';
 
 import { styles } from './styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Ingredient } from '@/components/Ingredient';
 import { Selected } from '@/components/Selected';
 import { router } from 'expo-router';
+import { services } from '@/services';
 
 export default function Index() {
   const [selected, setSelected] = useState<string[]>([]);
+  const [ingredients, setIngredients] = useState<IngredientResponse[]>([]);
 
   const handleToggleSelected = (value: string) => {
     if (selected.includes(value)) {
@@ -25,8 +27,12 @@ export default function Index() {
   };
 
   const handleSearch = () => {
-    router.navigate('/recipes');
+    router.navigate('/recipes/' + selected);
   };
+
+  useEffect(() => {
+    services.ingredients.findAll().then((data) => setIngredients(data));
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -40,20 +46,14 @@ export default function Index() {
       </Text>
 
       <ScrollView contentContainerStyle={styles.ingredients} showsHorizontalScrollIndicator={false}>
-        {/* {ingredients.map((ingredient) => (
-        <Ingredient
-          key={ingredient.name}
-          name={ingredient.name}
-          image={`${services.storage.imagePath}/${ingredient.image}`}
-        />
-      ))} */}
-        {Array.from({ length: 100 }).map((item, index) => (
+        {ingredients.map((ingredient) => (
           <Ingredient
-            key={index}
-            image=""
-            name="tomate"
-            selected={selected.includes(String(index))}
-            onPress={() => handleToggleSelected(String(index))}
+            key={ingredient.name}
+            name={ingredient.name}
+            image={ingredient.image}
+            selected={selected.includes(ingredient.id)}
+            onPress={() => handleToggleSelected(String(ingredient.id))}
+            // image={`${services.storage.imagePath}/${ingredient.image}`}
           />
         ))}
       </ScrollView>
